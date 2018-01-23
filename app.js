@@ -1,31 +1,57 @@
-var express = require('express'),
-  mongoose = require('mongoose');
+let express = require('express'),
+  mongoose = require('mongoose'),
+  bodyParser = require('body-parser');
 
-var db = mongoose.connect('mongodb://localhost/bookAPI');
+let db = mongoose.connect('mongodb://localhost/bookAPI');
 
+let Book = require('./books/book-model');
+let app = express();
+let port = process.env.PORT || 3100;
 
-var Book = require('./books/book-model');
-var app = express();
-var port = process.env.PORT || 3100;
+/**
+ * @see https://github.com/expressjs/body-parser
+ * Returns middleware that only parses urlencoded bodies and only looks at requests where the Content-Type header matches the type option. This parser accepts only UTF-8 encoding of the body and supports automatic inflation of gzip and deflate encodings.
+ * A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body). This object will contain key-value pairs, where the value can be a string or array (when extended is false), or any type (when extended is true).
+ * 
+ * Options
+ * The urlencoded function takes an optional options object that may contain any of the following keys:
+ * 
+ * extended
+ * The extended option allows to choose between parsing the URL-encoded data with the querystring library (when false) or the qs library (when true). The "extended" syntax allows for rich objects and arrays to be encoded into the URL-encoded format, allowing for a JSON-like experience with URL-encoded. For more information, please see the qs library.
+ * 
+ * Defaults to true, but using the default has been deprecated. Please research into the difference between qs and querystring and choose the appropriate setting.
+ */
+app.use(bodyParser.urlencoded({ extended: true }));
+/**
+ * Returns middleware that only parses json and only looks at requests where the Content-Type header matches the type option. This parser accepts any Unicode encoding of the body and supports automatic inflation of gzip and deflate encodings.
+ * 
+ * A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body).
+ */
+app.use(bodyParser.json());
 
-var bookRouter = express.Router();
+let bookRouter = express.Router();
 bookRouter.route('/books')
+  .post(function (req, res) {
+    let book = new Book(req.body);
+    console.log(book);
+    res.send(book);
+  })
   .get(function (req, res) {
     let query = {};
-    if(req.query.genre) query.genre = req.query.genre;
+    if (req.query.genre) query.genre = req.query.genre;
     console.log(query);
-    Book.find(query, function (err, books) { 
-      if(err) res.status(500).send(err);
+    Book.find(query, function (err, books) {
+      if (err) res.status(500).send(err);
       else res.json(books);
     });
   });
 bookRouter.route('/books/:bookId')
-.get(function (req, res) {
-  Book.findById(req.params.bookId, function (err, book) { 
-    if(err) res.status(500).send(err);
-    else res.json(book);
+  .get(function (req, res) {
+    Book.findById(req.params.bookId, function (err, book) {
+      if (err) res.status(500).send(err);
+      else res.json(book);
+    });
   });
-});
 app.use('/api', bookRouter);
 app.get('/', function (req, res) {
   res.send('Welcome to my API!');
