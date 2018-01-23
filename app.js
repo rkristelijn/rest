@@ -33,13 +33,12 @@ let bookRouter = express.Router();
 bookRouter.route('/books')
   .post(function (req, res) {
     let book = new Book(req.body);
-    console.log(book);
-    res.send(book);
+    book.save();
+    res.status(201).send(book);
   })
   .get(function (req, res) {
     let query = {};
     if (req.query.genre) query.genre = req.query.genre;
-    console.log(query);
     Book.find(query, function (err, books) {
       if (err) res.status(500).send(err);
       else res.json(books);
