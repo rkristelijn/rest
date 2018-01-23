@@ -2,7 +2,7 @@ let express = require('express'),
   mongoose = require('mongoose'),
   bodyParser = require('body-parser');
 
-let db = mongoose.connect('mongodb://localhost/bookAPI');
+let db = mongoose.connect('mongodb://localhost/bookAPI', { useMongoClient: true });
 
 let app = express();
 let port = process.env.PORT || 3100;
