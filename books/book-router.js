@@ -3,7 +3,7 @@ let express = require('express'),
 
 let routes = function () {
   let bookRouter = express.Router();
-  bookRouter.route('/books')
+  bookRouter.route('/')
     .post(function (req, res) {
       let book = new Book(req.body);
       book.save();
@@ -17,7 +17,7 @@ let routes = function () {
         else res.json(books);
       });
     });
-  bookRouter.route('/books/:bookId')
+  bookRouter.route('/:bookId')
     .get(function (req, res) {
       Book.findById(req.params.bookId, function (err, book) {
         if (err) res.status(500).send(err);
