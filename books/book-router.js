@@ -10,6 +10,7 @@ let routes = function () {
 
 
   bookRouter.use('/:bookId', function (req, res, next) {
+    console.log("REQUEST", req.params);
     Book.findById(req.params.bookId, function (err, book) {
       if (err) res.status(500).send(err);
       else if (book) {
@@ -21,9 +22,7 @@ let routes = function () {
     });
   });
   bookRouter.route('/:bookId')
-    .get(function (req, res) {
-      res.json(req.book);
-    })
+    .get(bookController.getOne)
     .put(function (req, res) {
       req.book.title = req.body.title;
       req.book.author = req.body.author;

@@ -15,10 +15,28 @@ let bookController = function (Book) {
     if (req.query.genre) query.genre = req.query.genre;
     Book.find(query, function (err, books) {
       if (err) res.status(500).send(err);
-      else res.json(books);
+      else {
+        let returnBooks = [];
+        books.forEach(element => {
+          let newBook = element.toJSON();
+          newBook.links = {};
+          newBook.links.self = 'http://' + req.headers.host + '/api/books/' + newBook._id;
+          returnBooks.push(newBook);
+        });
+        res.json(returnBooks);
+      }
     });
   };
+
+  let getOne = function (req, res) {
+    let returnBook = req.book.toJSON();
+    returnBook.links = {};
+    returnBook.links.filterByThisGenre = 'http://' + req.headers.host + '/api/books/?genre=' + returnBook.genre.replace(' ', '%20');
+    res.json(returnBook);
+  }
+
   return {
+    getOne: getOne,
     post: post,
     get: get
   }
